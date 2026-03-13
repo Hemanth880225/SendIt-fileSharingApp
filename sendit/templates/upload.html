@@ -1,26 +1,109 @@
 {% extends "base.html" %}
 {% block title %}Upload{% endblock %}
+{% block page_title %}Upload{% endblock %}
+
 {% block content %}
-<h2 class="mb-4 text-primary">Upload a File</h2>
+<div class="row justify-content-center pt-3">
+    <div class="col-12 col-lg-8 col-xl-6">
+        <div class="card-clean p-4 p-md-5">
+            <div class="d-flex align-items-center gap-3 mb-4 border-bottom pb-4">
+                <div class="d-flex justify-content-center align-items-center bg-light text-dark rounded" style="width: 48px; height: 48px;">
+                    <i class="bi bi-cloud-arrow-up-fill fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Upload File</h5>
+                    <p class="text-muted mb-0 fs-7">Add a new file to your workspace.</p>
+                </div>
+            </div>
 
-<form method="POST" enctype="multipart/form-data" class="border p-4 bg-white rounded shadow-sm">
-    {{ form.hidden_tag() }}
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
 
-    <div class="mb-3">
-        {{ form.description.label(class="form-label") }}
-        {{ form.description(class="form-control", placeholder="Enter description") }}
+                <!-- JS-powered Dropzone -->
+                <div class="mb-4">
+                    <label class="form-label-clean mb-2">Select File</label>
+                    <div id="dropzone" class="dropzone-clean position-relative">
+                        <div id="dropzoneText">
+                            <i class="bi bi-file-earmark-arrow-up fs-2 text-muted mb-2 d-block"></i>
+                            <span class="fw-medium text-dark d-block mb-1">Click to browse or drag file here</span>
+                            <span class="text-muted fs-7">Supports text, images, pdf, zip (max 256MB)</span>
+                        </div>
+                        <div id="filePreview" class="d-none flex-column align-items-center">
+                            <i class="bi bi-file-earmark-check fs-1 text-dark mb-2"></i>
+                            <span id="fileNameDisplay" class="fw-semibold text-dark text-truncate w-75"></span>
+                            <span class="text-muted fs-7 mt-1">Click to change file</span>
+                        </div>
+                        {{ form.file(class="form-control file-input position-absolute top-0 start-0 w-100 h-100 opacity-0", id="formFile", style="cursor: pointer;") }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form.description.label(class="form-label-clean") }}
+                    {{ form.description(class="form-control-clean", placeholder="Optional description") }}
+                </div>
+
+                <div class="mb-5">
+                    {{ form.folder_id.label(class="form-label-clean") }}
+                    {{ form.folder_id(class="form-select form-control-clean") }}
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{{ url_for('folders') }}" class="btn-outline-clean text-decoration-none">Cancel</a>
+                    {{ form.submit(class="btn-black btn-upload px-4") }}
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        {{ form.file.label(class="form-label") }}
-        {{ form.file(class="form-control") }}
-    </div>
+{% endblock %}
 
-    <div class="mb-3">
-        {{ form.folder_id.label(class="form-label") }}
-        {{ form.folder_id(class="form-select") }}
-    </div>
+{% block scripts %}
+<script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('formFile');
+    const dropzoneText = document.getElementById('dropzoneText');
+    const filePreview = document.getElementById('filePreview');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const btnUpload = document.querySelector('.btn-upload');
 
-    {{ form.submit(class="btn btn-primary w-100") }}
-</form>
+    // Drag over effects
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) { dropzone.classList.add('dragover'); }
+    function unhighlight(e) { dropzone.classList.remove('dragover'); }
+
+    // Handle file selection
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            let fileName = this.files[0].name;
+            dropzoneText.classList.add('d-none');
+            filePreview.classList.remove('d-none');
+            filePreview.classList.add('d-flex');
+            fileNameDisplay.textContent = fileName;
+        } else {
+            dropzoneText.classList.remove('d-none');
+            filePreview.classList.add('d-none');
+            filePreview.classList.remove('d-flex');
+        }
+    });
+</script>
+<style>
+    .fs-7 { font-size: 0.85rem; }
+</style>
 {% endblock %}

@@ -1,148 +1,158 @@
 {% extends "base.html" %}
-{% block title %}Folder View | SendIt{% endblock %}
+{% block title %}{{ folder.name }}{% endblock %}
+{% block page_title %}Folder view{% endblock %}
+
 {% block content %}
-
-<div class="container py-4">
-
-  <!-- 🧭 Breadcrumb Navigation -->
-  <nav aria-label="breadcrumb" class="mb-4">
-    <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
-      <li class="breadcrumb-item">
-        <a href="{{ url_for('folders') }}" class="text-decoration-none text-primary">
-          <i class="bi bi-house-door"></i> Root
+<!-- Breadcrumbs / Top Actions -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0" style="font-size: 0.9rem; font-weight: 500;">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('folders') }}" class="text-decoration-none text-muted hover-dark">
+                    Folders
+                </a>
+            </li>
+            {% for crumb in breadcrumbs %}
+                {% if not loop.last %}
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('uploads_by_folder', folder_id=crumb.id) }}" class="text-decoration-none text-muted hover-dark">
+                            {{ crumb.name }}
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="breadcrumb-item active text-dark" aria-current="page">{{ crumb.name }}</li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </nav>
+    <div class="d-flex gap-3">
+        <div class="position-relative">
+            <i class="bi bi-search position-absolute text-muted" style="left: 10px; top: 50%; transform: translateY(-50%);"></i>
+            <input type="text" id="fileSearch" class="form-control-clean ps-4" placeholder="Filter files..." style="width: 220px;">
+        </div>
+        <a href="{{ url_for('upload') }}" class="btn-black text-decoration-none">
+            Upload File
         </a>
-      </li>
-      {% for crumb in breadcrumbs %}
-        {% if not loop.last %}
-          <li class="breadcrumb-item">
-            <a href="{{ url_for('uploads_by_folder', folder_id=crumb.id) }}" class="text-decoration-none text-primary">
-              {{ crumb.name }}
-            </a>
-          </li>
-        {% else %}
-          <li class="breadcrumb-item active" aria-current="page">{{ crumb.name }}</li>
-        {% endif %}
-      {% endfor %}
-    </ol>
-  </nav>
-
-  <!-- 📁 Subfolders Section -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-semibold text-secondary mb-0">
-      <i class="bi bi-folder-fill text-warning me-1"></i> Subfolders
-    </h4>
-  </div>
-
-  {% if subfolders %}
-  <div class="row g-4 mb-5">
-    {% for sub in subfolders %}
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="card folder-card text-center shadow-sm border-0 h-100">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <div>
-              <i class="bi bi-folder2-open text-warning" style="font-size: 2.5rem;"></i>
-              <h6 class="mt-2 fw-semibold text-dark">{{ sub.name }}</h6>
-              <p class="text-muted small mb-2">
-                {{ sub.files|length }} file{{ 's' if sub.files|length != 1 else '' }}
-              </p>
-            </div>
-            <div class="d-flex justify-content-center gap-2 mt-2">
-              <a href="{{ url_for('uploads_by_folder', folder_id=sub.id) }}" class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-folder2-open"></i> Open
-              </a>
-              <form action="{{ url_for('delete_folder', id=sub.id) }}" method="POST"
-                    onsubmit="return confirm('Delete this folder and all its contents?');">
-                <button class="btn btn-sm btn-outline-danger">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  {% else %}
-    <p class="text-muted fst-italic">No subfolders available.</p>
-  {% endif %}
-
-  <!-- 📄 Files Section -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-semibold text-secondary mb-0">
-      <i class="bi bi-file-earmark-fill text-info me-1"></i> Files
-    </h4>
-  </div>
-
-  {% if files %}
-  <div class="row g-4">
-    {% for file in files %}
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="card file-card text-center shadow-sm border-0 h-100">
-          <div class="card-body d-flex flex-column justify-content-between">
-            <div>
-              <i class="bi bi-file-earmark-text text-info" style="font-size: 2.3rem;"></i>
-              <h6 class="mt-2 fw-semibold text-dark text-truncate" title="{{ file.filename }}">
-                {{ file.filename }}
-              </h6>
-            </div>
-            <div class="d-flex justify-content-center gap-2 mt-2">
-              <a href="#" class="btn btn-sm btn-outline-success" title="Download">
-                <i class="bi bi-download"></i>
-              </a>
-              <form action="{{ url_for('delete_file', id=file.id) }}" method="POST"
-                    onsubmit="return confirm('Delete this file permanently?');">
-                <button class="btn btn-sm btn-outline-danger" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  {% else %}
-    <p class="text-muted fst-italic">No files in this folder.</p>
-  {% endif %}
+    </div>
 </div>
 
-<!-- 🌈 Custom Styles -->
+<!-- Table View for Subfolders & Files -->
+<div class="card-clean overflow-hidden">
+    <table class="table-clean w-100" id="contentsTable">
+        <thead class="bg-light">
+            <tr>
+                <th style="width: 40%;">Name</th>
+                <th style="width: 30%;">Description</th>
+                <th style="width: 20%;">Date Modified</th>
+                <th style="width: 10%; text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if not subfolders and not files %}
+            <tr>
+                <td colspan="4" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-3 mb-2 d-block opacity-50"></i>
+                    This folder is empty
+                </td>
+            </tr>
+            {% endif %}
+
+            <!-- Subfolders -->
+            {% for sub in subfolders %}
+            <tr class="content-row">
+                <td>
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-folder-fill fs-5" style="color: #666;"></i>
+                        <a href="{{ url_for('uploads_by_folder', folder_id=sub.id) }}" class="text-decoration-none text-dark fw-medium content-name">
+                            {{ sub.name }}
+                        </a>
+                    </div>
+                </td>
+                <td class="text-muted fs-7">—</td>
+                <td class="text-muted fs-7">{{ sub.created_at.strftime('%b %d, %Y') }}</td>
+                <td class="text-end">
+                    <div class="dropdown">
+                        <button class="btn btn-sm text-muted p-1 border-0" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm fs-7">
+                            <li><a class="dropdown-item" href="{{ url_for('rename_folder', id=sub.id) }}">Rename</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ url_for('delete_folder', id=sub.id) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this folder permanently?');">
+                                    <button type="submit" class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">Delete</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+
+            <!-- Files -->
+            {% for file in files %}
+            <tr class="content-row">
+                <td>
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-file-earmark-text text-muted fs-5"></i>
+                        <span class="text-dark fw-medium content-name text-truncate" style="max-width: 200px;" title="{{ file.filename }}">
+                            {{ file.filename }}
+                        </span>
+                    </div>
+                </td>
+                <td class="text-muted fs-7 text-truncate" style="max-width: 200px;" title="{{ file.description }}">
+                    {{ file.description or '—' }}
+                </td>
+                <td class="text-muted fs-7">{{ file.uploaded_at.strftime('%b %d, %Y') }}</td>
+                <td class="text-end">
+                    <div class="dropdown">
+                        <button class="btn btn-sm text-muted p-1 border-0" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm fs-7">
+                            <li><a class="dropdown-item" href="{{ url_for('update_file', id=file.id) }}">Edit Details</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('rename_file', id=file.id) }}">Rename File</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('static', filename='uploads/' + file.filename) }}" download>Download</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ url_for('delete_file', id=file.id) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this file permanently?');">
+                                    <button type="submit" class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">Delete</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Simple client-side table filtering
+    document.getElementById('fileSearch').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('.content-row');
+        rows.forEach(function(row) {
+            let name = row.querySelector('.content-name').textContent.toLowerCase();
+            if (name.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 <style>
-  .folder-card, .file-card {
-    border-radius: 12px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .folder-card:hover, .file-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  }
-
-  .breadcrumb {
-    font-size: 0.9rem;
-  }
-
-  .breadcrumb a {
-    text-decoration: none;
-  }
-
-  .btn-outline-danger:hover {
-    color: #fff;
-    background-color: #dc3545;
-    border-color: #dc3545;
-  }
-
-  .btn-outline-primary:hover {
-    color: #fff;
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-  }
-
-  .btn-outline-success:hover {
-    color: #fff;
-    background-color: #198754;
-    border-color: #198754;
-  }
+    .hover-dark { transition: color 0.15s; }
+    .hover-dark:hover { color: var(--text-main) !important; }
+    .fs-7 { font-size: 0.85rem; }
+    .dropdown-item { padding: 0.4rem 1rem; font-weight: 500; }
+    .dropdown-menu { border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
 </style>
-
 {% endblock %}

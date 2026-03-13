@@ -1,30 +1,54 @@
 {% extends "base.html" %}
+{% block title %}Account Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-md-4 text-center">
-      <img src="{{ image_file }}" alt="Profile Picture" class="img-thumbnail rounded-circle mb-3" width="150">
+<div class="row mt-3 max-w-4xl mx-auto">
+    
+    <!-- Profile Sidebar Info -->
+    <div class="col-md-4 mb-4 mb-md-0">
+        <div class="card-clean p-4 text-center h-100 border shadow-sm">
+            <div class="position-relative d-inline-block mb-3">
+                <img src="{{ image_file }}" alt="Avatar" class="rounded-circle border" style="width: 120px; height: 120px; object-fit: cover;">
+            </div>
+            <h5 class="fw-bold mb-1">{{ current_user.username }}</h5>
+            <p class="text-muted fs-7 mb-3">{{ current_user.email }}</p>
+            <span class="badge bg-light text-dark border fw-medium px-3 py-2 rounded-pill fs-7">
+                Joined {{ current_user.created_at.strftime('%Y') }}
+            </span>
+        </div>
     </div>
 
+    <!-- Edit Profile Form -->
     <div class="col-md-8">
-      <h2 class="fw-semibold mb-4 text-primary">Your Account</h2>
-      <form method="POST" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <div class="mb-3">
-          {{ form.username.label(class="form-label") }}
-          {{ form.username(class="form-control") }}
+        <div class="card-clean p-4 p-md-5 h-100 border shadow-sm">
+            <h5 class="fw-bold mb-4 border-bottom pb-3">Update Profile</h5>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="row g-4 mb-3">
+                    <div class="col-md-6">
+                        {{ form.username.label(class="form-label-clean") }}
+                        {{ form.username(class="form-control-clean") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.email.label(class="form-label-clean") }}
+                        {{ form.email(class="form-control-clean") }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form.picture.label(class="form-label-clean") }}
+                    {{ form.picture(class="form-control form-control-sm form-control-clean") }}
+                    <div class="form-text mt-1 fs-7">JPG, PNG, or GIF. Max size 2MB.</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-4 border-top">
+                    {{ form.submit(class="btn-black btn-sm px-4 py-2") }}
+                </div>
+            </form>
         </div>
-        <div class="mb-3">
-          {{ form.email.label(class="form-label") }}
-          {{ form.email(class="form-control") }}
-        </div>
-        <div class="mb-3">
-          {{ form.picture.label(class="form-label") }}
-          {{ form.picture(class="form-control") }}
-        </div>
-        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
-      </form>
     </div>
-  </div>
 </div>
 {% endblock %}

@@ -1,7 +1,48 @@
-{% extends "base.html" %}
-{% block title %}Welcome to SendIt{% endblock %}
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SendIt - Welcome to SendIt</title>
 
-{% block content %}
+    <!-- Bootstrap CSS for structure and modals -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom Minimal Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    
+</head>
+<body>
+
+
+    <!-- =======================================
+         PUBLIC LAYOUT (Unauthenticated Users)
+    ======================================== -->
+    <nav class="topbar justify-content-between px-4">
+        <a class="text-decoration-none fw-bold text-dark fs-5 d-flex align-items-center gap-2" href="/home">
+            <i class="bi bi-layers-fill"></i> SendIt
+        </a>
+        <div class="d-flex gap-2">
+            <a href="/login" class="btn-outline-clean text-decoration-none">Log In</a>
+            <a href="/register" class="btn-black text-decoration-none">Sign Up</a>
+        </div>
+    </nav>
+    
+    <main class="d-flex align-items-center justify-content-center min-vh-100" style="margin-top: -64px; background-color: var(--bg-main);">
+        <div class="container w-100 max-w-lg mt-5">
+            <!-- Flash Messages -->
+            <div class="flash-container w-100 mx-auto mb-4" style="max-width: 400px;">
+                
+                  
+                
+            </div>
+
+
+            <!-- SINGLE CONTENT BLOCK -->
+            
 <div class="row align-items-center min-vh-100" style="margin-top: -64px;">
     <div class="col-12 text-center text-md-start col-md-7 col-lg-6 mb-5 mb-md-0 px-md-5">
         <div class="d-inline-block px-3 py-1 mb-4 rounded-pill border" style="background-color: var(--bg-surface); font-size: 0.85rem; font-weight: 500;">
@@ -14,13 +55,8 @@
             A blazing fast, minimalist platform to organize your folders, securely upload documents, and access them anywhere without friction.
         </p>
         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-md-start">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('folders') }}" class="btn-black py-3 px-5 fs-6">Go to Dashboard</a>
-                <a href="{{ url_for('upload') }}" class="btn-outline-clean py-3 px-5 fs-6">Upload File</a>
-            {% else %}
-                <a href="{{ url_for('register') }}" class="btn-black py-3 px-5 fs-6">Start for free</a>
-                <a href="{{ url_for('login') }}" class="btn-outline-clean py-3 px-5 fs-6">Sign in</a>
-            {% endif %}
+            <a href="/register" class="btn-black py-3 px-5 fs-6">Start for free</a>
+            <a href="/login" class="btn-outline-clean py-3 px-5 fs-6">Sign in</a>
         </div>
     </div>
     
@@ -52,4 +88,16 @@
         </div>
     </div>
 </div>
-{% endblock %}
+
+
+
+        </div>
+    </main>
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>

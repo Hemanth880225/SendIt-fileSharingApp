@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 
 app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Hvarmac2005%40@localhost:5432/sendit_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads') #absolute path where files are saved
 app.config['MAX_CONTENT_LENGTH'] =  256 * 1024 * 1024 #optional protection to block files over 256 MB
