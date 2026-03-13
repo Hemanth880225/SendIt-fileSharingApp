@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Update File{% endblock %}
+{% block content %}
+<h2 class="mb-4 text-primary">Edit File</h2>
+
+<form method="POST" enctype="multipart/form-data" class="border p-4 rounded bg-white shadow-sm">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.file.label(class="form-label") }}
+        {{ form.file(class="form-control") }}
+        <small class="text-muted">Leave blank if you don’t want to upload a new file.</small>
+    </div>
+
+    <div class="mb-3">
+        {{ form.folder_id.label(class="form-label") }}
+        {{ form.folder_id(class="form-select") }}
+    </div>
+
+    {{ form.submit(class="btn btn-primary w-100") }}
+</form>
+{% endblock %}

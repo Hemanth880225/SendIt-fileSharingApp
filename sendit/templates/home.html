@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Welcome to WorkHub Flow Dashboard</h2>
+<p class="text-muted">Current Time (IST): {{ current_time }}</p>
+
+<hr>
+
+<h4>Your Recent Projects</h4>
+<ul class="list-group mb-4">
+  {% for p in recent_projects %}
+    <li class="list-group-item">{{ p.name }}</li>
+  {% else %}
+    <li class="list-group-item text-muted">No recent projects found.</li>
+  {% endfor %}
+</ul>
+
+<h4>Your Open Tasks</h4>
+<ul class="list-group mb-4">
+  {% for t in my_open_tasks %}
+    <li class="list-group-item">{{ t.title }} — {{ t.status }}</li>
+  {% else %}
+    <li class="list-group-item text-muted">No open tasks right now.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
