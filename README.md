@@ -1,64 +1,106 @@
-# SendIt — Secure File Sharing & Management System
+# SendIt — Secure File Sharing & File Management System
 
 **SendIt** is a **secure file sharing and file management web application** built using **Flask**.
-It allows users to upload, organize, manage, and access files securely through a clean dashboard interface.
+It enables users to upload, organize, rename, and manage files securely through a structured dashboard.
 
-This project demonstrates **real-world backend development concepts** including authentication, file handling, folder organization, and structured application architecture.
+This project demonstrates **real-world backend engineering concepts** including authentication, file handling, folder management, and clean architecture.
 
 ---
 
 # 🚀 Project Overview
 
-SendIt enables users to:
+SendIt allows users to:
 
 * Upload files securely
 * Organize files into folders
 * Rename files and folders
-* Manage uploaded content
-* Access files through a dashboard
+* Manage uploads
+* View dashboard
+* Manage profile
 
-This project is designed as a **production-style file management backend** with clean architecture.
+This project is designed using **modular Flask architecture** and **production-style project structure**.
 
 ---
 
 # 🏗️ High-Level Architecture
 
 ```
-┌────────────────────────────────────────────────────┐
-│                   Client Layer                     │
-│----------------------------------------------------│
-│ Browser / User Interface                           │
-└───────────────────────────┬────────────────────────┘
-                            │ HTTP Requests
-                            ▼
-┌────────────────────────────────────────────────────┐
-│                 Flask Application                  │
-│----------------------------------------------------│
-│ Routes Layer                                       │
-│                                                    │
-│ • Authentication Routes                            │
-│ • File Upload Routes                               │
-│ • Folder Management Routes                         │
-└───────────────────────────┬────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────┐
-│                 Service Layer                      │
-│----------------------------------------------------│
-│ Business Logic                                     │
-│                                                    │
-│ • File Upload Logic                                │
-│ • Folder Organization                              │
-│ • File Rename                                      │
-└───────────────────────────┬────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────┐
-│                  Data Layer                        │
-│----------------------------------------------------│
-│ SQLAlchemy Models                                  │
-│ SQLite Database                                    │
-└────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                         Client Layer                         │
+│--------------------------------------------------------------│
+│ Browser / Web UI                                             │
+│ HTML | CSS | JavaScript | Bootstrap                          │
+└───────────────────────────────┬──────────────────────────────┘
+                                │ HTTP Requests
+                                ▼
+┌──────────────────────────────────────────────────────────────┐
+│                      Flask Application                       │
+│--------------------------------------------------------------│
+│ Routes Layer                                                 │
+│                                                              │
+│ • Authentication Routes                                      │
+│ • File Upload Routes                                         │
+│ • Folder Management Routes                                   │
+│ • Profile Routes                                             │
+└───────────────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     Business Logic Layer                      │
+│--------------------------------------------------------------│
+│ Application Logic                                            │
+│                                                              │
+│ • File Upload Logic                                          │
+│ • Folder Organization                                        │
+│ • File Rename Logic                                          │
+│ • User Management                                            │
+└───────────────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────┐
+│                         Data Layer                           │
+│--------------------------------------------------------------│
+│ SQLAlchemy Models                                            │
+│ SQLite Database                                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+# 📂 Project Structure
+
+```
+sendit
+│
+├── static
+│   ├── css
+│   │   └── style.css
+│   ├── js
+│   │   └── main.js
+│   ├── profile_pics
+│   └── uploads
+│
+├── templates
+│   ├── account.html
+│   ├── base.html
+│   ├── folders.html
+│   ├── home.html
+│   ├── login.html
+│   ├── register.html
+│   ├── rename_file.html
+│   ├── rename_folder.html
+│   ├── update.html
+│   ├── upload.html
+│   ├── uploads.html
+│   └── uploads_by_folder.html
+│
+├── __init__.py
+├── config.py
+├── forms.py
+├── models.py
+├── routes.py
+│
+└── README.md
 ```
 
 ---
@@ -91,59 +133,43 @@ This project is designed as a **production-style file management backend** with 
 
 # ✨ Features
 
-## Authentication System
+# Authentication
 
 * User Registration
 * User Login
-* Session-based authentication
-* Secure user access
+* User Profile
 
 ---
 
-## File Management
+# File Management
 
 * Upload files
 * Rename files
 * Delete files
-* Download files
+* Organize files
 
 ---
 
-## Folder Management
+# Folder Management
 
 * Create folders
 * Rename folders
-* Organize files into folders
+* Organize uploads
 
 ---
 
-## Dashboard
+# Dashboard
 
-* Organized file view
-* Folder navigation
-* User-specific files
-
----
-
-# 📂 Project Structure
-
-```
-SendIt
-│
-├── static/           # CSS, JS, Images
-├── templates/        # HTML templates
-├── models.py         # Database models
-├── routes.py         # Flask routes
-├── app.py / run.py   # Entry point
-└── uploads/          # Uploaded files
-```
+* View uploaded files
+* View folders
+* Manage files
 
 ---
 
 # 🧠 Application Flow
 
 ```
-User Registers / Login
+User Login/Register
         ↓
 Access Dashboard
         ↓
@@ -160,24 +186,25 @@ Manage Files
 
 ## User Table
 
-| Field    | Type    |
-| -------- | ------- |
-| id       | Integer |
-| username | String  |
-| email    | String  |
-| password | String  |
+| Field      | Type    |
+| ---------- | ------- |
+| id         | Integer |
+| username   | String  |
+| email      | String  |
+| password   | String  |
+| image_file | String  |
 
 ---
 
 ## File Table
 
-| Field      | Type       |
-| ---------- | ---------- |
-| id         | Integer    |
-| filename   | String     |
-| filepath   | String     |
-| user_id    | ForeignKey |
-| created_at | DateTime   |
+| Field     | Type       |
+| --------- | ---------- |
+| id        | Integer    |
+| filename  | String     |
+| filepath  | String     |
+| user_id   | ForeignKey |
+| folder_id | ForeignKey |
 
 ---
 
@@ -195,7 +222,8 @@ Manage Files
 
 * User authentication
 * User-specific file access
-* Secure file upload handling
+* Secure uploads
+* Folder isolation
 
 ---
 
@@ -207,7 +235,7 @@ Clone repository
 git clone https://github.com/Hemanth880225/SendIt.git
 ```
 
-Navigate to project
+Navigate
 
 ```
 cd SendIt
@@ -219,7 +247,7 @@ Create virtual environment
 python -m venv venv
 ```
 
-Activate environment
+Activate
 
 Windows
 
@@ -236,10 +264,10 @@ pip install -r requirements.txt
 Run application
 
 ```
-python app.py
+python run.py
 ```
 
-Open in browser
+Open
 
 ```
 http://127.0.0.1:5000
@@ -251,11 +279,11 @@ http://127.0.0.1:5000
 
 This project demonstrates:
 
-* File handling in Flask
+* Flask architecture
+* File handling
 * User authentication
 * Database relationships
-* Folder organization logic
-* Dashboard UI design
+* Dashboard design
 * Full-stack Flask development
 
 ---
@@ -263,25 +291,26 @@ This project demonstrates:
 # 🔮 Future Improvements
 
 * Expiring file links
-* Shareable file URLs
-* File download analytics
-* Cloud storage integration
+* File sharing links
 * Drag and drop uploads
+* Cloud storage integration
 * File preview support
+* Download analytics
 
 ---
 
 # ⭐ Resume Description
 
 **SendIt — Secure File Sharing System**
-Built a secure file sharing application using Flask with authentication, file upload system, folder organization, and dashboard interface. Implemented database relationships using SQLAlchemy and designed clean project architecture.
+Built a secure file sharing system using Flask with authentication, file upload system, folder organization, and dashboard interface. Designed modular architecture and implemented SQLAlchemy database relationships.
 
 ---
 
 # 👨‍💻 Author
 
 Hemanth
-Python | Flask | Backend Development
+Backend Developer
+Python | Flask | System Design
 
 ---
 
