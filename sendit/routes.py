@@ -262,6 +262,8 @@ def register():
     return render_template('register.html', form=form)
 
 
+from sendit import bcrypt
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -273,7 +275,7 @@ def login():
 
         user = User.query.filter_by(email=form.email.data).first()
 
-        if user and check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
 
             login_user(user)
 
