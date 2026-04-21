@@ -1,17 +1,18 @@
 from werkzeug.utils import secure_filename
 from sendit.models import FileUpload, Folder, User
-from sendit import app,db
-from flask import render_template,flash,redirect,url_for,request,abort
+from sendit import app, db, bcrypt
+from flask import render_template, flash, redirect, url_for, request, abort
 from datetime import datetime
 from sendit.forms import FolderForm, RenameFolderForm, RenameFileForm, RegisterForm, LoginForm, UploadForm, UpdateAccountForm
 from flask_login import current_user, login_required, login_user, logout_user
-from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 import os
 
 ALLOWED_EXTENSIONS = {'png', 'jpg','jpeg','gif','pdf','txt','zip'}
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/')
 @app.route('/home')
@@ -20,8 +21,7 @@ def home():
         return redirect(url_for("folders"))
     return render_template("home.html")
 
-from sendit.forms import FolderForm
-from sendit.models import Folder
+
 from sendit.models import ist_time
 
 @app.route('/folders', methods=['GET', 'POST'])
@@ -29,7 +29,7 @@ from sendit.models import ist_time
 def folders():
     form = FolderForm()
     user_folders = Folder.query.filter_by(user_id=current_user.id).all()
-    form.parent_id.choices = [(0, 'None (Root Folder)')] + [(f.id,f.name) for f in user_folders]
+    form.parent_id.choices = [(0, 'None (Root Folder)')] + [(f.id, f.name) for f in user_folders]
 
     if form.validate_on_submit():
         folder_name = form.name.data
@@ -39,7 +39,7 @@ def folders():
         new_folder = Folder(
             name=folder_name,
             created_at=ist_time(),
-            parent_id = parent_id,
+            parent_id=parent_id,
             user_id=current_user.id
         )
 
@@ -59,27 +59,27 @@ def folders():
 def upload():
     form = UploadForm()
 
-    form.folder_id.choices = [(f.id,f.name) for f in Folder.query.filter_by(user_id=current_user.id).all()]
+    form.folder_id.choices = [(f.id, f.name) for f in Folder.query.filter_by(user_id=current_user.id).all()]
 
     if form.validate_on_submit():
 
         file = form.file.data
         description = form.description.data
-        folder_id  = form.folder_id.data
+        folder_id = form.folder_id.data
 
         if not allowed_file(file.filename):
-            flash('Unsupported File Format','danger')
+            flash('Unsupported File Format', 'danger')
             return redirect(url_for('upload'))
 
         filename = secure_filename(file.filename)
 
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         upload_record = FileUpload(
             filename=filename,
             description=description,
-            folder_id = folder_id,
-            user_id = current_user.id
+            folder_id=folder_id,
+            user_id=current_user.id
         )
 
         db.session.add(upload_record)
@@ -89,7 +89,7 @@ def upload():
 
         return redirect(url_for('uploads_by_folder', folder_id=folder_id))
 
-    return render_template('upload.html' , form=form)
+    return render_template('upload.html', form=form)
 
 
 @app.route('/folders/<int:folder_id>')
@@ -101,7 +101,6 @@ def uploads_by_folder(folder_id):
     files = folder.files
 
     breadcrumbs = []
-
     current = folder
 
     while current:
@@ -117,7 +116,7 @@ def uploads_by_folder(folder_id):
     )
 
 
-@app.route('/delete/<int:id>',methods=['POST'])
+@app.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_file(id):
     file = FileUpload.query.get_or_404(id)
@@ -135,7 +134,7 @@ def delete_file(id):
     return redirect(url_for('uploads_by_folder', folder_id=file.folder_id))
 
 
-@app.route('/folder/delete/<int:id>',methods=['POST'])
+@app.route('/folder/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_folder(id):
     folder = Folder.query.get_or_404(id)
@@ -162,13 +161,9 @@ def update_file(id):
         file.description = form.description.data
 
         if form.file.data:
-
             new_file = form.file.data
-
             filename = secure_filename(new_file.filename)
-
             new_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
             file.filename = filename
 
         file.folder_id = form.folder_id.data
@@ -180,7 +175,6 @@ def update_file(id):
         return redirect(url_for('uploads_by_folder', folder_id=file.folder_id))
 
     elif request.method == 'GET':
-
         form.description.data = file.description
         form.folder_id.data = file.folder_id
 
@@ -195,20 +189,16 @@ def rename_folder(id):
     form = RenameFolderForm()
 
     if form.validate_on_submit():
-
-        folder.name= form.name.data
-
+        folder.name = form.name.data
         db.session.commit()
 
         flash('Folder renamed successfully!', 'success')
-
         return redirect(url_for('folders'))
 
     elif request.method == 'GET':
-
         form.name.data = folder.name
 
-    return render_template('rename_folder.html', form=form,folder=folder)
+    return render_template('rename_folder.html', form=form, folder=folder)
 
 
 @app.route('/rename/<int:id>', methods=['GET', 'POST'])
@@ -219,17 +209,13 @@ def rename_file(id):
     form = RenameFileForm()
 
     if form.validate_on_submit():
-
         file.filename = form.filename.data
-
         db.session.commit()
 
         flash('File renamed successfully!', 'success')
-
         return redirect(url_for('uploads_by_folder', folder_id=file.folder_id))
 
     elif request.method == 'GET':
-
         form.filename.data = file.filename
 
     return render_template('rename_file.html', form=form, file=file)
@@ -244,25 +230,22 @@ def register():
 
     if form.validate_on_submit():
 
-        hashed_pw = generate_password_hash(form.password.data)
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
         user = User(
             username=form.username.data,
             email=form.email.data,
-            password=hashed_pw
+            password=hashed_password
         )
 
         db.session.add(user)
         db.session.commit()
 
-        flash('Account created successfully! Please log in.', 'success')
-
+        flash('Account created successfully!', 'success')
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
 
-
-from sendit import bcrypt
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -286,7 +269,6 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('folders'))
 
         else:
-
             flash('Login unsuccessful!', 'danger')
 
     return render_template('login.html', form=form)
@@ -296,17 +278,14 @@ def login():
 @login_required
 def logout():
     logout_user()
-
     flash('Logout successful!', 'info')
-
     return redirect(url_for('login'))
 
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
 
-    _,f_ext = os.path.splitext(form_picture.filename)
-
+    _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
 
     picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
@@ -316,7 +295,7 @@ def save_picture(form_picture):
     return picture_fn
 
 
-@app.route('/account' , methods=['GET', 'POST'])
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
@@ -324,9 +303,7 @@ def account():
     if form.validate_on_submit():
 
         if form.picture.data:
-
             picture_file = save_picture(form.picture.data)
-
             current_user.image_file = picture_file
 
         current_user.username = form.username.data
@@ -339,7 +316,6 @@ def account():
         return redirect(url_for('account'))
 
     elif request.method == 'GET':
-
         form.username.data = current_user.username
         form.email.data = current_user.email
 
