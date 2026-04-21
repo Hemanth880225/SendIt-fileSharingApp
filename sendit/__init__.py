@@ -29,8 +29,12 @@ from sendit.models import FileUpload
 def make_shell_context_processor():
     return {'db': db , 'Fileupload': FileUpload}
 
+
+
+from sendit.models import FileUpload
 from sendit import routes
 
+# ✅ ADD THIS EXACT BLOCK AT THE END
 with app.app_context():
     db.create_all()
 
