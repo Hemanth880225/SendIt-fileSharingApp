@@ -31,4 +31,7 @@ def make_shell_context_processor():
 
 from sendit import routes
 
+with app.app_context():
+    db.create_all()
+
 
